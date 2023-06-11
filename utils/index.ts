@@ -15,9 +15,16 @@ export const errorResponse = (err: never | any) => {
   return msg;
 };
 
-export function safeObject<T>(obj: any, defaultValue = {}) {
-  if (!!obj && typeof obj === "object") {
-    return obj as T;
-  }
-  return defaultValue as T;
+export function fileToBase64(eFile: File | null | undefined) {
+  return new Promise((resolve) => {
+    if (!eFile) {
+      resolve("");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.readAsDataURL(eFile);
+  });
 }

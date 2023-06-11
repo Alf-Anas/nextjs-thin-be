@@ -5,7 +5,7 @@ import { ROUTE } from "@/constant/route";
 import Footer from "./Footer";
 import HeaderNav from "./HeaderNav";
 import Head from "next/head";
-import { useIsLoggedIn } from "thin-backend-react";
+import { useCurrentUser, useIsLoggedIn } from "thin-backend-react";
 import { loginWithRedirect, logout } from "thin-backend";
 
 const { Header, Content } = LayoutANTD;
@@ -22,6 +22,7 @@ export default function PublicLayout({ children }: Props) {
 
   const isLoggedIn = useIsLoggedIn();
   const [isLoading, setIsLoading] = useState(false);
+  const user = useCurrentUser();
 
   async function doLogin() {
     setIsLoading(true);
@@ -45,7 +46,7 @@ export default function PublicLayout({ children }: Props) {
         if (jwt) {
           window.location.href = window.location.href.split("?")[0];
         }
-      }, 850);
+      }, 1500);
     }
   }, [router]);
 
@@ -95,15 +96,20 @@ export default function PublicLayout({ children }: Props) {
               </Button>
             )}
             {isLoggedIn && (
-              <Button
-                type="primary"
-                onClick={doLogout}
-                disabled={isLoading}
-                style={{ margin: "auto" }}
-                danger
-              >
-                Logout
-              </Button>
+              <>
+                <span style={{ color: "white", marginRight: "1rem" }}>
+                  {user?.email}
+                </span>
+                <Button
+                  type="primary"
+                  onClick={doLogout}
+                  disabled={isLoading}
+                  style={{ margin: "auto" }}
+                  danger
+                >
+                  Logout
+                </Button>
+              </>
             )}
           </div>
         </Header>
