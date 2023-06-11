@@ -184,7 +184,6 @@ export default function AddProduct({
           >
             <Upload
               name="foto"
-              listType="picture"
               accept=".png, .jpg"
               fileList={
                 product.foto && typeof product.foto !== "string"
