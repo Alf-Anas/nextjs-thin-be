@@ -1,4 +1,4 @@
-import { Button, Layout as LayoutANTD, theme } from "antd";
+import { Button, Layout as LayoutANTD, message, theme } from "antd";
 import React, { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { ROUTE } from "@/constant/route";
@@ -7,6 +7,8 @@ import HeaderNav from "./HeaderNav";
 import Head from "next/head";
 import { useCurrentUser, useIsLoggedIn } from "thin-backend-react";
 import { loginWithRedirect, logout } from "thin-backend";
+import { fetchJWT } from "@/config/fetchJWT";
+import { errorResponse } from "@/utils";
 
 const { Header, Content } = LayoutANTD;
 
@@ -32,21 +34,24 @@ export default function PublicLayout({ children }: Props) {
 
   async function doLogout() {
     setIsLoading(true);
+    localStorage.removeItem("ihp_jwt");
+    localStorage.removeItem("ihp_user_id");
     await logout({
       redirect: window.location.href.split("?")[0],
     });
     setIsLoading(false);
   }
 
-  // Refresh page after login
+  // Refresh page adn get jwt after login
   useEffect(() => {
     if (router.query?.userId && router.query?.accessToken) {
-      setTimeout(() => {
-        const jwt = localStorage.getItem("ihp_jwt");
-        if (jwt) {
-          window.location.href = window.location.href.split("?")[0];
-        }
-      }, 1500);
+      fetchJWT(String(router.query?.userId), String(router.query?.accessToken))
+        .then((resOk) => {
+          if (resOk) {
+            window.location.href = window.location.href.split("?")[0];
+          }
+        })
+        .catch((err) => message.error(errorResponse(err)));
     }
   }, [router]);
 
